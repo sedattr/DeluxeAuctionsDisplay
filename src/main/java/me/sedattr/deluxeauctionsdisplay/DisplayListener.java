@@ -30,7 +30,6 @@ public class DisplayListener implements Listener {
 
             Auction auc = AuctionCache.getAuction(displayManager.getAuction());
             if (auc == null || auc.isEnded()) {
-                displayManager.changeAuction(null);
                 Utils.sendMessage(player, "ended_auction");
                 return;
             }
