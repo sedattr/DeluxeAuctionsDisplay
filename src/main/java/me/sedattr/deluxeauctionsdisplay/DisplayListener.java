@@ -11,7 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
-public class DisplayListeners implements Listener {
+public class DisplayListener implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractAtEntityEvent event) {
         if (!(event.getRightClicked() instanceof ArmorStand armorStand))

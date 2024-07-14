@@ -44,6 +44,11 @@ public class DisplayDatabase {
                 if (position <= 0)
                     continue;
 
+                if (location.getWorld() == null) {
+                    DisplayPlugin.getInstance().database.delete(name);
+                    return;
+                }
+
                 DisplayManager displayManager = new DisplayManager(location, position, name);
                 displayManagers.put(name, displayManager);
             }
@@ -77,7 +82,7 @@ public class DisplayDatabase {
         }
     }
 
-    public void delete(DisplayManager displayManager) {
+    public void delete(String name) {
         if (!this.database.exists())
             return;
 
@@ -85,7 +90,7 @@ public class DisplayDatabase {
             YamlConfiguration configuration = new YamlConfiguration();
             configuration.load(this.database);
 
-            configuration.set(displayManager.getName(), null);
+            configuration.set(name, null);
 
             configuration.save(this.database);
             if (this.database.length() <= 0)

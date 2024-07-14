@@ -2,6 +2,10 @@ package me.sedattr.deluxeauctionsdisplay;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
@@ -42,6 +46,55 @@ public class Utils {
         } catch (Exception e) {
             throw new IllegalStateException("Unable to save location.", e);
         }
+    }
+
+    public static void loadChunk(Location location) {
+        if (!location.getChunk().isLoaded())
+            location.getChunk().load();
+    }
+
+    public static void removeOldEntities(Location location) {
+        if (location == null || location.getWorld() == null)
+            return;
+        loadChunk(location);
+
+        Location secondLocation = location.clone().add(0, 0.25, 0);
+        for (Entity entity : location.getWorld().getNearbyEntities(location, 2, 2, 2)) {
+            EntityType entityType = entity.getType();
+
+            if (entityType.equals(EntityType.ARMOR_STAND)) {
+                if (entity.getLocation().equals(location) || entity.getLocation().equals(secondLocation))
+                    entity.remove();
+            } else if (entityType.name().endsWith("ITEM")) {
+                String customName = entity.getCustomName();
+                if (customName != null && customName.equalsIgnoreCase("deluxeauctions"))
+                    entity.remove();
+            }
+        }
+    }
+
+    public static void updateArmorStand(ArmorStand armorStand) {
+        loadChunk(armorStand.getLocation());
+
+        armorStand.setVisible(false);
+        armorStand.setRemoveWhenFarAway(false);
+        armorStand.setGravity(false);
+        armorStand.setBasePlate(false);
+        armorStand.setCustomNameVisible(false);
+        armorStand.setCanPickupItems(false);
+    }
+
+    public static float getYaw(Player player) {
+        float yaw = player.getLocation().getYaw();
+
+        if (yaw >= 135 || yaw <= -135)
+            return -180;
+        if (yaw < 45 && yaw >= -45)
+            return 0;
+        if (yaw >= 45)
+            return 90;
+
+        return -90;
     }
 
     public static Location locationFromBase64(String data) throws IOException {

@@ -1,6 +1,7 @@
 package me.sedattr.deluxeauctionsdisplay;
 
 import me.sedattr.deluxeauctions.others.Utils;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -10,6 +11,8 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static me.sedattr.deluxeauctionsdisplay.Utils.getYaw;
 
 public class DisplayCommand implements CommandExecutor, TabCompleter {
     @Override
@@ -62,7 +65,12 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
                     return false;
                 }
 
-                new DisplayManager(player, name, rank);
+                Location location = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getBlockY() - 1.425, player.getLocation().getBlockZ() + 0.5, getYaw(player), 0);
+                DisplayManager displayManager = new DisplayManager(location, rank, name);
+
+                DisplayPlugin.getInstance().database.save(displayManager);
+                DisplayPlugin.getInstance().displays.put(name, displayManager);
+                me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "created");
                 return true;
             }
 
@@ -79,9 +87,10 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
                     return false;
                 }
 
-                DisplayPlugin.getInstance().displays.remove(name);
                 displayManager.delete();
-                DisplayPlugin.getInstance().database.delete(displayManager);
+                DisplayPlugin.getInstance().displays.remove(name);
+
+                DisplayPlugin.getInstance().database.delete(name);
 
                 me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "deleted");
                 return true;
