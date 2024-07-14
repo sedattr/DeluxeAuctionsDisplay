@@ -1,0 +1,16 @@
+name: DeluxeAuctionsDisplay
+main: me.sedattr.deluxeauctionsdisplay.DisplayPlugin
+
+author: SedatTR
+version: 1.1
+api-version: 1.13
+
+description: Display addon for the best, cheap, advanced, fully customizable auction plugin!
+website: https://discord.gg/nchk86TKMT
+depend:
+  - DeluxeAuctions
+
+commands:
+  auctiondisplay:
+    description: Default auction display command.
+    aliases: [deluxeauctionsdisplay, ahdisplay, aucdisplay]

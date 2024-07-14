@@ -1,0 +1,68 @@
+# _ ________________ ________________ ________________ _
+#|_|________________|________________|________________|_|
+#| |   _____  ______  _       _    _ __   __ ______   | |
+#| |  |  __ \|  ___ \| |     | |  | |\ \ / /|  ___ \  | |
+#|_|  | |  | | |__ \/| |     | |  | | \ V / | |__ \/  |_|
+#| |  | |  | |  __|  | |     | |  | |  > <  |  __     | |
+#| |  | |__| | |___/\| |___/\| |__| | / . \ | |___/\  | |
+#|_|  |_____/|______/|______/\______//_/ \_\\______/  |_|
+#| |                                                  | |
+#| |      DeluxeAuctions Display - SedatTR#8666       | |
+#|_|________________ ________________ ________________|_|
+#|_|________________|________________|________________|_|
+# If you have any question or suggestion please contact to me.
+# If you are using this plugin, you are accepting Terms of Use.
+#
+# Discord Account: SedatTR#8666
+# Discord Server: https://discord.gg/nchk86TKMT
+# Plugin Wiki: https://sedattr.gitbook.io/deluxeauctions
+auction_type: ALL # Auction Types: ALL, BIN, NORMAL
+refresh_time: 60 # IN SECONDS
+titles:
+  without_auction:
+    enabled: true
+    line_1: "&ePosition: &f#%display_position%"
+    line_2: "&7It is empty right now!"
+  with_auction:
+    enabled: true
+    line_1: "&e#%display_position% &f%auction_name%"
+    line_2: "&7By: &f%seller_displayname%"
+
+default_item: # Default item for display.
+  material: WHITE_STAINED_GLASS # Material for display item.
+  data: 0
+  spawn_item: true # Should auction item will be dropped?
+
+display_items:
+  top_1: # Name of the display. (/ahdisplay create [NAME] [position])
+    material: ORANGE_STAINED_GLASS
+    data: 1
+    spawn_item: true
+  top_2:
+    material: YELLOW_STAINED_GLASS
+    data: 4
+    spawn_item: true
+  top_3:
+    material: LIME_STAINED_GLASS
+    data: 5
+    spawn_item: true
+
+permission: "auctiondisplay.command"
+no_permission: "&8[&cAuction Display&8] &cYou don't have enough permission!"
+
+command_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay [create / list / delete / teleport]"
+create_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay create [name] [position]"
+teleport_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay teleport [name]"
+delete_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay delete [name]"
+
+empty_display: "&8[&cAuction Display&8] &7This display is empty!"
+ended_auction: "&8[&cAuction Display&8] &7This auction is ended!"
+display_list: "&8- &aName: &f%display_name% &8| &ePosition: &f%display_position%"
+total_display: "&8[&aAuction Display&8] &7Total Display Amount: &f%display_amount% displays"
+created: "&8[&aAuction Display&8] &7Display is successfully created!"
+deleted: "&8[&aAuction Display&8] &7Display is successfully deleted!"
+teleported: "&8[&aAuction Display&8] &7You are successfully teleported!"
+
+wrong_name: "&8[&cAuction Display&8] &7There isn't display with this name!"
+already_created: "&8[&cAuction Display&8] &7There is display with this name!"
+not_player: "&8[&cAuction Display&8] &cYou are not player!"
