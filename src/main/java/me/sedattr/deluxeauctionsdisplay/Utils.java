@@ -1,6 +1,9 @@
 package me.sedattr.deluxeauctionsdisplay;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -13,6 +16,7 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public class Utils {
@@ -51,6 +55,31 @@ public class Utils {
     public static void loadChunk(Location location) {
         if (!location.getChunk().isLoaded())
             location.getChunk().load();
+    }
+
+    public static void clearSign(Sign sign) {
+        if (sign == null)
+            return;
+
+        for (int i = 0; i <= 3; i++) {
+            sign.setLine(i, "");
+        }
+
+        sign.update();
+    }
+
+    public static Sign findSign(Location location) {
+        location = location.clone().add(0, 1, 0);
+
+        Block block = location.getBlock();
+        List<BlockFace> faces = Arrays.asList(BlockFace.EAST, BlockFace.WEST, BlockFace.SOUTH, BlockFace.NORTH);
+        for (BlockFace face : faces) {
+            Block relative = block.getRelative(face);
+            if (relative.getType().name().endsWith("SIGN") && relative.getState() instanceof Sign)
+                return (Sign) relative.getState();
+        }
+
+        return null;
     }
 
     public static void removeOldEntities(Location location) {

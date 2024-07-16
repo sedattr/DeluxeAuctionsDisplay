@@ -33,7 +33,7 @@ public class DisplayPlugin extends JavaPlugin {
         this.config = getConfig();
         this.database = new DisplayDatabase();
 
-        Bukkit.getPluginManager().registerEvents(new DisplayListener(), DisplayPlugin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new DisplayListeners(), DisplayPlugin.getInstance());
 
         PluginCommand command = getCommand("auctiondisplay");
         if (command != null)

@@ -65,7 +65,7 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
                     return false;
                 }
 
-                Location location = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getBlockY() - 1.425, player.getLocation().getBlockZ() + 0.5, getYaw(player), 0);
+                Location location = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getBlockY() - 1.375, player.getLocation().getBlockZ() + 0.5, getYaw(player), 0);
                 DisplayManager displayManager = new DisplayManager(location, rank, name);
 
                 DisplayPlugin.getInstance().database.save(displayManager);

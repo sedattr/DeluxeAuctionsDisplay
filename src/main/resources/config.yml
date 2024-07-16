@@ -28,6 +28,24 @@ titles:
     line_1: "&e#%display_position% &f%auction_name%"
     line_2: "&7By: &f%seller_displayname%"
 
+sign:
+  bin:
+    enabled: true
+    lines:
+      - "&0#%display_position%"
+      - "&6%auction_price% coins"
+      - "&f%auction_name%"
+      - "&b%seller_displayname%"
+  normal:
+    enabled: true
+    lines:
+      - "&0#%display_position%"
+      - "&6%auction_price% coins"
+      - "&f%auction_name%"
+      - "&b%bid_amount% bids"
+
+# Shulker boxes are not shown in colored glasses, it's because of the Minecraft.
+# You should use normal glass to show shulker boxes.
 default_item: # Default item for display.
   material: WHITE_STAINED_GLASS # Material for display item.
   data: 0

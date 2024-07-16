@@ -6,11 +6,14 @@ import me.sedattr.deluxeauctions.managers.Auction;
 import me.sedattr.deluxeauctions.others.PlaceholderUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.util.List;
 import java.util.UUID;
 
 import static me.sedattr.deluxeauctionsdisplay.Utils.*;
@@ -26,6 +29,7 @@ public class DisplayManager {
     private UUID auction;
     private Item item;
     private boolean spawnItem = true;
+    private Sign sign;
 
     public DisplayManager(Location location, Integer position, String name) {
         this.name = name;
@@ -49,7 +53,10 @@ public class DisplayManager {
         if (itemStack != null)
             this.headStand.setHelmet(itemStack);
 
+        this.sign = Utils.findSign(this.location);
+
         updateTitles(null);
+        updateSign(null);
     }
 
     private ItemStack getItemStack() {
@@ -70,6 +77,7 @@ public class DisplayManager {
         Utils.loadChunk(this.location);
         this.auction = null;
 
+        Utils.clearSign(this.sign);
         if (this.item != null)
             this.item.remove();
         if (this.headStand != null)
@@ -78,9 +86,60 @@ public class DisplayManager {
             this.titleStand.remove();
     }
 
+    private void updateSign(Auction auctionManager) {
+        if (this.sign == null)
+            return;
+
+        if (auctionManager == null) {
+            Utils.clearSign(this.sign);
+            return;
+        }
+
+        ConfigurationSection section = DisplayPlugin.getInstance().config.getConfigurationSection("sign." + auctionManager.getAuctionType().name().toLowerCase());
+        if (section == null) {
+            Utils.clearSign(this.sign);
+            return;
+        }
+
+        if (!section.getBoolean("enabled")) {
+            Utils.clearSign(this.sign);
+            return;
+        }
+
+        double price = auctionManager.getAuctionPrice();
+        if (auctionManager.getAuctionBids().getHighestBid() != null)
+            price = auctionManager.getAuctionBids().getHighestBid().getBidPrice();
+
+        OfflinePlayer player = Bukkit.getOfflinePlayer(auctionManager.getAuctionOwner());
+        String name = player.getName();
+
+        PlaceholderUtil placeholderUtil = new PlaceholderUtil()
+                .addPlaceholder("%display_position%", String.valueOf(this.position))
+                .addPlaceholder("%auction_price%", DeluxeAuctions.getInstance().numberFormat.format(price))
+                .addPlaceholder("%seller_name%", name)
+                .addPlaceholder("%auction_name%", me.sedattr.deluxeauctions.others.Utils.getDisplayName(auctionManager.getAuctionItem()))
+                .addPlaceholder("%seller_displayname%", auctionManager.getAuctionOwnerDisplayName())
+                .addPlaceholder("%bid_amount%", String.valueOf(auctionManager.getAuctionBids().getPlayerBids().size()));
+
+        List<String> lines = section.getStringList("lines");
+        for (int i = 0; i <= 3; i++) {
+            String text = me.sedattr.deluxeauctions.others.Utils.colorize(me.sedattr.deluxeauctions.others.Utils.replacePlaceholders(lines.get(i), placeholderUtil));
+
+            if (this.sign.getType().name().endsWith("HANGING_SIGN")) {
+                if (text.length() > 12)
+                    this.sign.setLine(i, text.substring(0, 12) + "...");
+                else
+                    this.sign.setLine(i, text);
+            }
+            else
+                this.sign.setLine(i, text);
+        }
+
+        this.sign.update();
+    }
+
     public void changeAuction(Auction auction) {
         Utils.loadChunk(this.location);
-        updateTitles(auction);
 
         if (auction == null || this.location.getWorld() == null) {
             if (this.item != null)
@@ -89,11 +148,16 @@ public class DisplayManager {
             this.auction = null;
             this.item = null;
 
+            updateTitles(null);
+            updateSign(null);
             return;
         }
 
         if (this.auction != null && this.auction.equals(auction.getAuctionUUID()))
             return;
+
+        updateTitles(auction);
+        updateSign(auction);
 
         if (this.spawnItem) {
             if (this.item != null)
@@ -121,10 +185,8 @@ public class DisplayManager {
             return;
         }
 
-        Player player = Bukkit.getPlayer(auc.getAuctionOwner());
-        String name = "";
-        if (player != null)
-            name = player.getName();
+        OfflinePlayer player = Bukkit.getOfflinePlayer(auc.getAuctionOwner());
+        String name = player.getName();
 
         double price = auc.getAuctionPrice();
         if (auc.getAuctionBids().getHighestBid() != null)
