@@ -28,6 +28,20 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length > 0) {
+            if (args[0].equalsIgnoreCase("reload")) {
+                for (DisplayManager manager : DisplayPlugin.getInstance().displays.values())
+                    manager.delete();
+
+                DisplayPlugin.getInstance().config = DisplayPlugin.getInstance().getConfig();
+
+                DisplayPlugin.getInstance().database.loadItems();
+                DisplayPlugin.getInstance().database.load();
+                DisplayPlugin.getInstance().database.updater();
+
+                me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "reloaded");
+                return true;
+            }
+
             if (args[0].equalsIgnoreCase("teleport")) {
                 if (args.length < 2) {
                     me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "teleport_usage");

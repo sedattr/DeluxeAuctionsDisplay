@@ -16,9 +16,7 @@ import org.bukkit.util.Vector;
 import java.util.List;
 import java.util.UUID;
 
-import static me.sedattr.deluxeauctionsdisplay.Utils.*;
-
-@Getter
+    @Getter
 public class DisplayManager {
     private final String name;
     private final int position;
@@ -41,6 +39,7 @@ public class DisplayManager {
         }
 
         this.location = location.clone();
+        Utils.loadChunk(this.location);
         Utils.removeOldEntities(this.location);
 
         this.headStand = location.getWorld().spawn(location, ArmorStand.class);
@@ -153,9 +152,6 @@ public class DisplayManager {
             return;
         }
 
-        if (this.auction != null && this.auction.equals(auction.getAuctionUUID()))
-            return;
-
         updateTitles(auction);
         updateSign(auction);
 
@@ -202,8 +198,6 @@ public class DisplayManager {
     }
 
     private void updateTitle(String type, PlaceholderUtil placeholderUtil) {
-        loadChunk(this.location);
-
         ConfigurationSection section = DisplayPlugin.getInstance().config.getConfigurationSection("titles." + type);
         if (section == null || !section.getBoolean("enabled")) {
             this.headStand.setCustomNameVisible(false);

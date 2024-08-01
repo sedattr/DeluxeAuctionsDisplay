@@ -3,14 +3,13 @@ package me.sedattr.deluxeauctionsdisplay;
 import me.sedattr.deluxeauctions.cache.AuctionCache;
 import me.sedattr.deluxeauctions.managers.Auction;
 import me.sedattr.deluxeauctions.managers.AuctionType;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +17,8 @@ import java.util.*;
 
 public class DisplayDatabase {
     private final File database = new File(DisplayPlugin.getInstance().getDataFolder(), "database.yml");
+    private BukkitTask task;
+
     public void load() {
         if (!this.database.exists())
             return;
@@ -101,7 +102,10 @@ public class DisplayDatabase {
     }
 
     public void updater() {
-        new BukkitRunnable() {
+        if (this.task != null)
+            this.task.cancel();
+
+        this.task = new BukkitRunnable() {
             @Override
             public void run() {
                 List<Auction> auctions = AuctionCache.getFilteredAuctions(AuctionType.valueOf(DisplayPlugin.getInstance().config.getString("auction_type", "ALL")), null, null);
@@ -116,8 +120,6 @@ public class DisplayDatabase {
 
                     displayManager.changeAuction(auctions.get(displayManager.getPosition() - 1));
                 }
-
-                Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&bDeluxeAuctions Display&8] &aAuction displays are refreshed!"));
             }
         }.runTaskTimer(DisplayPlugin.getInstance(), 100, DisplayPlugin.getInstance().config.getInt("refresh_time", 60) * 20L);
     }
