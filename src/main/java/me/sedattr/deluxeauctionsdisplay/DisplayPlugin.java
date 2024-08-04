@@ -19,6 +19,7 @@ public class DisplayPlugin extends JavaPlugin {
 
     public HashMap<String, ItemStack> items = new HashMap<>();
     public HashMap<String, DisplayManager> displays = new HashMap<>();
+    public Set<DisplayItem> placeItems = new HashSet<DisplayItem>();
 
     @Override
     public void onEnable() {

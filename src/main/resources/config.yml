@@ -28,6 +28,17 @@ titles:
     line_1: "&e#%display_position% &f%auction_name%"
     line_2: "&7By: &f%seller_displayname%"
 
+place_item:
+  material: PLAYER_HEAD
+  skin: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODAwM2MyMDdjNDAzYWYwNjkzYTllMjI2MWU2ODFkNTBlYzU3Y2Y4MmJlMmY1ZDM4NmIwYjlkMjcwN2Y3MTIwOSJ9fX0="
+  name: "&e#%display_position% &fAuction Display &7(&6%display_name%&7)"
+  lore:
+    - "&7Right click on a block"
+    - "&7to place auction display!"
+    - ""
+    - "&7Name: &a%display_name%"
+    - "&7Position: &a#%display_position%"
+
 sign:
   bin:
     enabled: true
@@ -73,6 +84,7 @@ command_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay [create / 
 create_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay create [name] [position]"
 teleport_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay teleport [name]"
 delete_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay delete [name]"
+give_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay give [position] (name)"
 
 empty_display: "&8[&cAuction Display&8] &7This display is empty!"
 ended_auction: "&8[&cAuction Display&8] &7This auction is ended!"
@@ -85,3 +97,6 @@ teleported: "&8[&aAuction Display&8] &7You are successfully teleported!"
 wrong_name: "&8[&cAuction Display&8] &7There isn't display with this name!"
 already_created: "&8[&cAuction Display&8] &7There is display with this name!"
 not_player: "&8[&cAuction Display&8] &cYou are not player!"
+
+given: "&8[&aAuction Display&8] &7Display place item is given!"
+placed: "&8[&aAuction Display&8] &7Auction display is placed!"

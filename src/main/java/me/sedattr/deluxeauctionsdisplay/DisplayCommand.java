@@ -1,16 +1,21 @@
 package me.sedattr.deluxeauctionsdisplay;
 
+import me.sedattr.deluxeauctions.others.PlaceholderUtil;
 import me.sedattr.deluxeauctions.others.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static me.sedattr.deluxeauctionsdisplay.Utils.getYaw;
 
@@ -28,6 +33,61 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length > 0) {
+            if (args[0].equalsIgnoreCase("give")) {
+                if (args.length < 2) {
+                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "give_usage");
+                    return false;
+                }
+
+                int position = Integer.parseInt(args[1]);
+                if (position <= 0) {
+                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "give_usage");
+                    return false;
+                }
+
+                String name = "";
+                if (args.length > 2) {
+                    name = args[2];
+
+                    if (DisplayPlugin.getInstance().displays.containsKey(name)) {
+                        me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "already_created");
+                        return false;
+                    }
+                } else
+                    for (String item : DisplayPlugin.getInstance().items.keySet()) {
+                        if (item.contains(args[1]) && !DisplayPlugin.getInstance().displays.containsKey(item)) {
+                            name = item;
+                            break;
+                        }
+                    }
+
+                if (name.isEmpty())
+                    name = String.valueOf(UUID.randomUUID()).replace("-", "").substring(0, 10);
+
+                ConfigurationSection section = DisplayPlugin.getInstance().config.getConfigurationSection("place_item");
+                if (section == null)
+                    return false;
+
+                ItemStack itemStack = Utils.createItemFromSection(section, null);
+                if (itemStack == null)
+                    return false;
+
+                PlaceholderUtil placeholderUtil = new PlaceholderUtil()
+                        .addPlaceholder("%display_name%", name)
+                        .addPlaceholder("%display_position%", String.valueOf(position));
+
+                Utils.changeLore(itemStack, section.getStringList("lore"), placeholderUtil);
+                Utils.changeName(itemStack, section.getString("name"), placeholderUtil);
+
+                player.getInventory().addItem(itemStack);
+                player.updateInventory();
+
+                new DisplayItem(itemStack, name, position);
+
+                me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "given");
+                return true;
+            }
+
             if (args[0].equalsIgnoreCase("reload")) {
                 for (DisplayManager manager : DisplayPlugin.getInstance().displays.values())
                     manager.delete();
@@ -103,7 +163,6 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
 
                 displayManager.delete();
                 DisplayPlugin.getInstance().displays.remove(name);
-
                 DisplayPlugin.getInstance().database.delete(name);
 
                 me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "deleted");
@@ -138,7 +197,11 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
         if (!commandSender.hasPermission(DisplayPlugin.getInstance().config.getString("permission", "auctiondisplay.command")) && !commandSender.isOp())
             return null;
 
-        ArrayList<String> complete = new ArrayList<>(Arrays.asList("create", "list", "delete"));
+        if (args.length > 0)
+            if (args[0].equalsIgnoreCase("teleport") || args[0].equalsIgnoreCase("delete"))
+                return DisplayPlugin.getInstance().displays.keySet().stream().toList();
+
+        ArrayList<String> complete = new ArrayList<>(Arrays.asList("create", "give", "list", "delete"));
 
         if (args.length == 1)
             return complete;
