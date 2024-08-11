@@ -1,6 +1,6 @@
 package me.sedattr.deluxeauctionsdisplay;
 
-import me.sedattr.deluxeauctions.cache.AuctionCache;
+import me.sedattr.auctionsapi.cache.AuctionCache;
 import me.sedattr.deluxeauctions.managers.Auction;
 import me.sedattr.deluxeauctions.managers.AuctionType;
 import org.bukkit.Location;

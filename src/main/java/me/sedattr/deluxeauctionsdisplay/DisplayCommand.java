@@ -2,7 +2,6 @@ package me.sedattr.deluxeauctionsdisplay;
 
 import me.sedattr.deluxeauctions.others.PlaceholderUtil;
 import me.sedattr.deluxeauctions.others.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

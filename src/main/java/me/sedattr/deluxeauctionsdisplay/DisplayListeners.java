@@ -1,6 +1,6 @@
 package me.sedattr.deluxeauctionsdisplay;
 
-import me.sedattr.deluxeauctions.cache.AuctionCache;
+import me.sedattr.auctionsapi.cache.AuctionCache;
 import me.sedattr.deluxeauctions.managers.Auction;
 import me.sedattr.deluxeauctions.managers.AuctionType;
 import me.sedattr.deluxeauctions.menus.BinViewMenu;
@@ -29,7 +29,9 @@ public class DisplayListeners implements Listener {
                 continue;
 
             event.setCancelled(true);
-            handleAuction(displayManager, player);
+            boolean result = handleAuction(displayManager, player);
+            if (!result)
+                Utils.clearSign(sign);
         }
     }
 
@@ -87,21 +89,23 @@ public class DisplayListeners implements Listener {
         }
     }
 
-    private void handleAuction(DisplayManager displayManager, Player player) {
+    private boolean handleAuction(DisplayManager displayManager, Player player) {
         if (displayManager.getAuction() == null) {
             Utils.sendMessage(player, "empty_display");
-            return;
+            return false;
         }
 
         Auction auc = AuctionCache.getAuction(displayManager.getAuction());
         if (auc == null || auc.isEnded()) {
             Utils.sendMessage(player, "ended_auction");
-            return;
+            return false;
         }
 
         if (auc.getAuctionType() == AuctionType.BIN)
             new BinViewMenu(player, auc).open("command");
         else
             new NormalViewMenu(player, auc).open("command");
+
+        return true;
     }
 }
