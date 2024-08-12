@@ -62,7 +62,7 @@ public class Utils {
             return;
 
         for (int i = 0; i <= 3; i++) {
-            sign.setLine(i, "");
+            sign.setLine(i, " ");
         }
 
         sign.update();

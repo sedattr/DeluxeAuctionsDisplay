@@ -73,6 +73,12 @@ public class DisplayListeners implements Listener {
                 event.setCancelled(true);
 
                 player.getInventory().removeItem(item);
+
+                if (DisplayPlugin.getInstance().displays.containsKey(displayItem.getName())) {
+                    Utils.sendMessage(player, "already_created");
+                    return;
+                }
+
                 Utils.sendMessage(player, "placed");
 
                 Location blockLocation = event.getBlock().getLocation();

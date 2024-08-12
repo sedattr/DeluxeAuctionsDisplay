@@ -38,7 +38,14 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
                     return false;
                 }
 
-                int position = Integer.parseInt(args[1]);
+                int position;
+                try {
+                    position = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "give_usage");
+                    return false;
+                }
+
                 if (position <= 0) {
                     me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "give_usage");
                     return false;
@@ -200,7 +207,7 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
             if (args[0].equalsIgnoreCase("teleport") || args[0].equalsIgnoreCase("delete"))
                 return DisplayPlugin.getInstance().displays.keySet().stream().toList();
 
-        ArrayList<String> complete = new ArrayList<>(Arrays.asList("create", "give", "list", "delete"));
+        ArrayList<String> complete = new ArrayList<>(Arrays.asList("create", "give", "teleport", "list", "delete"));
 
         if (args.length == 1)
             return complete;
