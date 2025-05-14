@@ -2,7 +2,7 @@ name: DeluxeAuctionsDisplay
 main: me.sedattr.deluxeauctionsdisplay.DisplayPlugin
 
 author: SedatTR
-version: 1.4
+version: 1.5
 api-version: 1.13
 
 description: Display addon for the best, cheap, advanced, fully customizable auction plugin!

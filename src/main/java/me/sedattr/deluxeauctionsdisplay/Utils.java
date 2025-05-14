@@ -53,8 +53,13 @@ public class Utils {
     }
 
     public static void loadChunk(Location location) {
-        if (!location.getChunk().isLoaded())
-            location.getChunk().load();
+        if (location.getWorld() == null) {
+            System.out.println("World is null!");
+            return;
+        }
+
+        location.getWorld().loadChunk(location.getChunk());
+        location.getChunk().load();
     }
 
     public static void clearSign(Sign sign) {

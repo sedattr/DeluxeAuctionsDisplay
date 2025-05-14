@@ -108,7 +108,7 @@ public class DisplayDatabase {
         this.task = new BukkitRunnable() {
             @Override
             public void run() {
-                List<Auction> auctions = AuctionCache.getFilteredAuctions(AuctionType.valueOf(DisplayPlugin.getInstance().config.getString("auction_type", "ALL")), null, null);
+                List<Auction> auctions = AuctionCache.getFilteredAuctions(AuctionType.valueOf(DisplayPlugin.getInstance().config.getString("auction_type", "ALL")), null, null, null);
                 auctions.sort(Comparator.comparing(Auction::getAuctionPrice));
                 Collections.reverse(auctions);
 
@@ -121,7 +121,7 @@ public class DisplayDatabase {
                     displayManager.changeAuction(auctions.get(displayManager.getPosition() - 1));
                 }
             }
-        }.runTaskTimer(DisplayPlugin.getInstance(), 100, DisplayPlugin.getInstance().config.getInt("refresh_time", 60) * 20L);
+        }.runTaskTimerAsynchronously(DisplayPlugin.getInstance(), 100, DisplayPlugin.getInstance().config.getInt("refresh_time", 60) * 20L);
     }
 
     public void loadItems() {

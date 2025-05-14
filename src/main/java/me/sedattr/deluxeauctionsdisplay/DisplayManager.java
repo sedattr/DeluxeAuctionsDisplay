@@ -11,12 +11,13 @@ import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.UUID;
 
-    @Getter
+@Getter
 public class DisplayManager {
     private final String name;
     private final int position;
@@ -138,38 +139,47 @@ public class DisplayManager {
     }
 
     public void changeAuction(Auction auction) {
-        Utils.loadChunk(this.location);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Utils.loadChunk(DisplayManager.this.location);
 
-        if (auction == null || this.location.getWorld() == null) {
-            if (this.item != null)
-                this.item.remove();
+                if (auction == null || DisplayManager.this.location.getWorld() == null) {
+                    if (DisplayManager.this.item != null)
+                        DisplayManager.this.item.remove();
 
-            this.auction = null;
-            this.item = null;
+                    DisplayManager.this.auction = null;
+                    DisplayManager.this.item = null;
 
-            updateTitles(null);
-            updateSign(null);
-            return;
-        }
+                    updateTitles(null);
+                    updateSign(null);
+                    return;
+                }
 
-        updateTitles(auction);
-        updateSign(auction);
+                updateTitles(auction);
+                updateSign(auction);
 
-        if (this.spawnItem) {
-            if (this.item != null)
-                this.item.remove();
+                if (DisplayManager.this.spawnItem) {
+                    if (DisplayManager.this.item != null) {
+                        DisplayManager.this.item.remove();
+                        System.out.println("Item was not null, item deleted.");
+                    } else
+                        System.out.println("Old item was null.");
 
-            ItemStack itemStack = auction.getAuctionItem().clone();
-            this.item = this.location.getWorld().dropItem(this.location.clone().add(0, 1.5, 0), itemStack);
+                    ItemStack itemStack = auction.getAuctionItem().clone();
+                    DisplayManager.this.item = DisplayManager.this.location.getWorld().dropItem(DisplayManager.this.location.clone().add(0, 1.5, 0), itemStack);
+                    DisplayManager.this.item.setVelocity(new Vector(0, 0, 0));
+                    DisplayManager.this.item.setPickupDelay(Integer.MAX_VALUE);
 
-            this.item.setVelocity(new Vector(0, 0, 0));
-            this.item.setPickupDelay(Integer.MAX_VALUE);
+                    DisplayManager.this.item.setCustomNameVisible(false);
+                    DisplayManager.this.item.setCustomName("DeluxeAuctions");
 
-            this.item.setCustomNameVisible(false);
-            this.item.setCustomName("DeluxeAuctions");
-        }
+                    System.out.println("New item created.");
+                }
 
-        this.auction = auction.getAuctionUUID();
+                DisplayManager.this.auction = auction.getAuctionUUID();
+            }
+        }.runTask(DisplayPlugin.getInstance());
     }
 
     private void updateTitles(Auction auc) {
