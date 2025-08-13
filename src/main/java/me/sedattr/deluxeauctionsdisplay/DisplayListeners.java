@@ -8,12 +8,15 @@ import me.sedattr.deluxeauctions.menus.NormalViewMenu;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class DisplayListeners implements Listener {
@@ -92,6 +95,16 @@ public class DisplayListeners implements Listener {
                 DisplayPlugin.getInstance().placeItems.remove(displayItem);
                 return;
             }
+        }
+    }
+
+    @EventHandler
+    public void onChunkUnload(ChunkUnloadEvent event) {
+        for (Entity entity : event.getChunk().getEntities()) {
+            if (!entity.hasMetadata("deluxeauctions_display"))
+                continue;
+
+            entity.remove();
         }
     }
 

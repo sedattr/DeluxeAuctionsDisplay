@@ -11,6 +11,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -44,7 +45,10 @@ public class DisplayManager {
         Utils.removeOldEntities(this.location);
 
         this.headStand = location.getWorld().spawn(location, ArmorStand.class);
+        this.headStand.setMetadata("deluxeauctions_display", new FixedMetadataValue(DisplayPlugin.getInstance(), true));
+
         this.titleStand = location.getWorld().spawn(location.clone().add(0, 0.25, 0), ArmorStand.class);
+        this.titleStand.setMetadata("deluxeauctions_display", new FixedMetadataValue(DisplayPlugin.getInstance(), true));
 
         Utils.updateArmorStand(this.headStand);
         Utils.updateArmorStand(this.titleStand);
@@ -161,20 +165,18 @@ public class DisplayManager {
 
                 if (DisplayManager.this.spawnItem) {
                     if (DisplayManager.this.item != null) {
+                        Utils.loadChunk(DisplayManager.this.item.getLocation());
+
                         DisplayManager.this.item.remove();
-                        System.out.println("Item was not null, item deleted.");
-                    } else
-                        System.out.println("Old item was null.");
+                        DisplayManager.this.item = null;
+                    }
 
                     ItemStack itemStack = auction.getAuctionItem().clone();
                     DisplayManager.this.item = DisplayManager.this.location.getWorld().dropItem(DisplayManager.this.location.clone().add(0, 1.5, 0), itemStack);
                     DisplayManager.this.item.setVelocity(new Vector(0, 0, 0));
                     DisplayManager.this.item.setPickupDelay(Integer.MAX_VALUE);
-
                     DisplayManager.this.item.setCustomNameVisible(false);
-                    DisplayManager.this.item.setCustomName("DeluxeAuctions");
-
-                    System.out.println("New item created.");
+                    DisplayManager.this.item.setMetadata("deluxeauctions_display", new FixedMetadataValue(DisplayPlugin.getInstance(), true));
                 }
 
                 DisplayManager.this.auction = auction.getAuctionUUID();

@@ -80,7 +80,7 @@ permission: "auctiondisplay.command"
 no_permission: "&8[&cAuction Display&8] &cYou don't have enough permission!"
 reloaded: "&8[&aAuction Display&8] &7Plugin is reloaded!"
 
-command_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay [create / list / delete / teleport]"
+command_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay [create / give / list / teleport / delete]"
 create_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay create [name] [position]"
 teleport_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay teleport [name]"
 delete_usage: "&8[&cAuction Display&8] &7Correct Usage: &f/ahdisplay delete [name]"

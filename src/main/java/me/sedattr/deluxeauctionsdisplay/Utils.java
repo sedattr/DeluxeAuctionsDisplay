@@ -1,6 +1,8 @@
 package me.sedattr.deluxeauctionsdisplay;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
@@ -53,13 +55,16 @@ public class Utils {
     }
 
     public static void loadChunk(Location location) {
-        if (location.getWorld() == null) {
-            System.out.println("World is null!");
+        if (location == null || location.getWorld() == null)
             return;
-        }
 
-        location.getWorld().loadChunk(location.getChunk());
-        location.getChunk().load();
+        Chunk chunk = location.getChunk();
+        World world = location.getWorld();
+        if (!world.isChunkLoaded(chunk))
+            world.loadChunk(chunk);
+
+        if (!chunk.isLoaded())
+            chunk.load(true);
     }
 
     public static void clearSign(Sign sign) {
@@ -92,18 +97,11 @@ public class Utils {
             return;
         loadChunk(location);
 
-        Location secondLocation = location.clone().add(0, 0.25, 0);
         for (Entity entity : location.getWorld().getNearbyEntities(location, 2, 2, 2)) {
-            EntityType entityType = entity.getType();
+            if (!entity.hasMetadata("deluxeauctions_display"))
+                return;
 
-            if (entityType.equals(EntityType.ARMOR_STAND)) {
-                if (entity.getLocation().equals(location) || entity.getLocation().equals(secondLocation))
-                    entity.remove();
-            } else if (entityType.name().endsWith("ITEM")) {
-                String customName = entity.getCustomName();
-                if (customName != null && customName.equalsIgnoreCase("deluxeauctions"))
-                    entity.remove();
-            }
+            entity.remove();
         }
     }
 
