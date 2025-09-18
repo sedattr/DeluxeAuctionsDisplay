@@ -1,5 +1,7 @@
 package me.sedattr.deluxeauctionsdisplay;
 
+import de.tr7zw.changeme.nbtapi.NBT;
+import me.sedattr.deluxeauctions.DeluxeAuctions;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -9,7 +11,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -92,14 +93,37 @@ public class Utils {
         return null;
     }
 
+    public static void setDisplayTag(Entity entity) {
+        if (DeluxeAuctions.getInstance().version >= 14) {
+            NBT.modifyPersistentData(entity, nbt -> {
+                nbt.setBoolean("deluxeauctions_display", true);
+            });
+        } else {
+            NBT.modify(entity, nbt -> {
+                nbt.setBoolean("deluxeauctions_display", true);
+            });
+        }
+    }
+
+    public static boolean isDisplay(Entity entity) {
+        if (DeluxeAuctions.getInstance().version >= 14) {
+            return NBT.getPersistentData(entity, nbt -> nbt.getBoolean("deluxeauctions_display"));
+        } else {
+            return NBT.get(entity, nbt -> {
+                return nbt.getBoolean("deluxeauctions_display");
+            });
+        }
+    }
+
     public static void removeOldEntities(Location location) {
         if (location == null || location.getWorld() == null)
             return;
         loadChunk(location);
 
         for (Entity entity : location.getWorld().getNearbyEntities(location, 2, 2, 2)) {
-            if (!entity.hasMetadata("deluxeauctions_display"))
-                return;
+            boolean isDisplay = Utils.isDisplay(entity);
+            if (!isDisplay)
+                continue;
 
             entity.remove();
         }

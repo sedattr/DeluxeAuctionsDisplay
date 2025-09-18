@@ -11,7 +11,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -45,10 +44,10 @@ public class DisplayManager {
         Utils.removeOldEntities(this.location);
 
         this.headStand = location.getWorld().spawn(location, ArmorStand.class);
-        this.headStand.setMetadata("deluxeauctions_display", new FixedMetadataValue(DisplayPlugin.getInstance(), true));
+        Utils.setDisplayTag(this.headStand);
 
         this.titleStand = location.getWorld().spawn(location.clone().add(0, 0.25, 0), ArmorStand.class);
-        this.titleStand.setMetadata("deluxeauctions_display", new FixedMetadataValue(DisplayPlugin.getInstance(), true));
+        Utils.setDisplayTag(this.titleStand);
 
         Utils.updateArmorStand(this.headStand);
         Utils.updateArmorStand(this.titleStand);
@@ -176,7 +175,7 @@ public class DisplayManager {
                     DisplayManager.this.item.setVelocity(new Vector(0, 0, 0));
                     DisplayManager.this.item.setPickupDelay(Integer.MAX_VALUE);
                     DisplayManager.this.item.setCustomNameVisible(false);
-                    DisplayManager.this.item.setMetadata("deluxeauctions_display", new FixedMetadataValue(DisplayPlugin.getInstance(), true));
+                    Utils.setDisplayTag(DisplayManager.this.item);
                 }
 
                 DisplayManager.this.auction = auction.getAuctionUUID();

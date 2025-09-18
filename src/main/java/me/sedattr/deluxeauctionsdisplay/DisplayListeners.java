@@ -9,7 +9,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -101,7 +100,8 @@ public class DisplayListeners implements Listener {
     @EventHandler
     public void onChunkUnload(ChunkUnloadEvent event) {
         for (Entity entity : event.getChunk().getEntities()) {
-            if (!entity.hasMetadata("deluxeauctions_display"))
+            boolean isDisplay = Utils.isDisplay(entity);
+            if (!isDisplay)
                 continue;
 
             entity.remove();
