@@ -16,25 +16,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static me.sedattr.deluxeauctionsdisplay.Utils.getYaw;
+import static me.sedattr.deluxeauctionsdisplay.others.Utils.getYaw;
 
 public class DisplayCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
-        if (!commandSender.hasPermission(DisplayPlugin.getInstance().config.getString("permission", "auctiondisplay.command")) && !commandSender.isOp()) {
-            me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(commandSender, "no_permission");
+        if (!commandSender.hasPermission(DeluxeAuctionsDisplay.getInstance().config.getString("permission", "auctiondisplay.command")) && !commandSender.isOp()) {
+            me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(commandSender, "no_permission");
             return false;
         }
 
         if (!(commandSender instanceof Player player)) {
-            me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(commandSender, "not_player");
+            me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(commandSender, "not_player");
             return false;
         }
 
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("give")) {
                 if (args.length < 2) {
-                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "give_usage");
+                    me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "give_usage");
                     return false;
                 }
 
@@ -42,12 +42,12 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
                 try {
                     position = Integer.parseInt(args[1]);
                 } catch (NumberFormatException e) {
-                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "give_usage");
+                    me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "give_usage");
                     return false;
                 }
 
                 if (position <= 0) {
-                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "give_usage");
+                    me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "give_usage");
                     return false;
                 }
 
@@ -55,13 +55,13 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
                 if (args.length > 2) {
                     name = args[2];
 
-                    if (DisplayPlugin.getInstance().displays.containsKey(name)) {
-                        me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "already_created");
+                    if (DeluxeAuctionsDisplay.getInstance().displays.containsKey(name)) {
+                        me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "already_created");
                         return false;
                     }
                 } else
-                    for (String item : DisplayPlugin.getInstance().items.keySet()) {
-                        if (item.contains(args[1]) && !DisplayPlugin.getInstance().displays.containsKey(item)) {
+                    for (String item : DeluxeAuctionsDisplay.getInstance().items.keySet()) {
+                        if (item.contains(args[1]) && !DeluxeAuctionsDisplay.getInstance().displays.containsKey(item)) {
                             name = item;
                             break;
                         }
@@ -70,7 +70,7 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
                 if (name.isEmpty())
                     name = String.valueOf(UUID.randomUUID()).replace("-", "").substring(0, 10);
 
-                ConfigurationSection section = DisplayPlugin.getInstance().config.getConfigurationSection("place_item");
+                ConfigurationSection section = DeluxeAuctionsDisplay.getInstance().config.getConfigurationSection("place_item");
                 if (section == null)
                     return false;
 
@@ -90,122 +90,122 @@ public class DisplayCommand implements CommandExecutor, TabCompleter {
 
                 new DisplayItem(itemStack, name, position);
 
-                me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "given");
+                me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "given");
                 return true;
             }
 
             if (args[0].equalsIgnoreCase("reload")) {
-                for (DisplayManager manager : DisplayPlugin.getInstance().displays.values())
+                for (DisplayManager manager : DeluxeAuctionsDisplay.getInstance().displays.values())
                     manager.delete();
 
-                DisplayPlugin.getInstance().config = DisplayPlugin.getInstance().getConfig();
+                DeluxeAuctionsDisplay.getInstance().config = DeluxeAuctionsDisplay.getInstance().getConfig();
 
-                DisplayPlugin.getInstance().database.loadItems();
-                DisplayPlugin.getInstance().database.load();
-                DisplayPlugin.getInstance().database.updater();
+                DeluxeAuctionsDisplay.getInstance().database.loadItems();
+                DeluxeAuctionsDisplay.getInstance().database.load();
+                DeluxeAuctionsDisplay.getInstance().database.updater();
 
-                me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "reloaded");
+                me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "reloaded");
                 return true;
             }
 
             if (args[0].equalsIgnoreCase("teleport")) {
                 if (args.length < 2) {
-                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "teleport_usage");
+                    me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "teleport_usage");
                     return false;
                 }
 
                 String name = args[1];
-                DisplayManager displayManager = DisplayPlugin.getInstance().displays.get(name);
+                DisplayManager displayManager = DeluxeAuctionsDisplay.getInstance().displays.get(name);
 
                 if (displayManager == null) {
-                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "wrong_name");
+                    me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "wrong_name");
                     return false;
                 }
 
                 player.teleport(displayManager.getTitleStand().getLocation().clone().add(0, 2, 0));
-                me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "teleported");
+                me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "teleported");
                 return true;
             }
 
             if (args[0].equalsIgnoreCase("create")) {
                 if (args.length < 3) {
-                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "create_usage");
+                    me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "create_usage");
                     return false;
                 }
 
                 String name = args[1];
-                if (DisplayPlugin.getInstance().displays.containsKey(name)) {
-                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "already_created");
+                if (DeluxeAuctionsDisplay.getInstance().displays.containsKey(name)) {
+                    me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "already_created");
                     return false;
                 }
 
                 int rank = Integer.parseInt(args[2]);
                 if (rank <= 0) {
-                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "create_usage");
+                    me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "create_usage");
                     return false;
                 }
 
                 Location location = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getBlockY() - 1.375, player.getLocation().getBlockZ() + 0.5, getYaw(player), 0);
                 DisplayManager displayManager = new DisplayManager(location, rank, name);
 
-                DisplayPlugin.getInstance().database.save(displayManager);
-                DisplayPlugin.getInstance().displays.put(name, displayManager);
-                me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "created");
+                DeluxeAuctionsDisplay.getInstance().database.save(displayManager);
+                DeluxeAuctionsDisplay.getInstance().displays.put(name, displayManager);
+                me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "created");
                 return true;
             }
 
             if (args[0].equalsIgnoreCase("delete")) {
                 if (args.length < 2) {
-                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "delete_usage");
+                    me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "delete_usage");
                     return false;
                 }
                 String name = args[1];
 
-                DisplayManager displayManager = DisplayPlugin.getInstance().displays.get(name);
+                DisplayManager displayManager = DeluxeAuctionsDisplay.getInstance().displays.get(name);
                 if (displayManager == null) {
-                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "wrong_name");
+                    me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "wrong_name");
                     return false;
                 }
 
                 displayManager.delete();
-                DisplayPlugin.getInstance().displays.remove(name);
-                DisplayPlugin.getInstance().database.delete(name);
+                DeluxeAuctionsDisplay.getInstance().displays.remove(name);
+                DeluxeAuctionsDisplay.getInstance().database.delete(name);
 
-                me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "deleted");
+                me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "deleted");
                 return true;
             }
 
             if (args[0].equalsIgnoreCase("list")) {
-                String list = DisplayPlugin.getInstance().config.getString("display_list", "&8- &aName: &f%display_name% &8| &ePosition: &f%display_position%");
+                String list = DeluxeAuctionsDisplay.getInstance().config.getString("display_list", "&8- &aName: &f%display_name% &8| &ePosition: &f%display_position%");
 
-                for (DisplayManager displayManager : DisplayPlugin.getInstance().displays.values()) {
+                for (DisplayManager displayManager : DeluxeAuctionsDisplay.getInstance().displays.values()) {
                     player.sendMessage(Utils.colorize(list
                             .replace("%display_position%", String.valueOf(displayManager.getPosition()))
                             .replace("%display_name%", displayManager.getName())));
                 }
 
-                String total = DisplayPlugin.getInstance().config.getString("total_display");
+                String total = DeluxeAuctionsDisplay.getInstance().config.getString("total_display");
                 if (total == null || total.isEmpty())
                     return false;
 
                 player.sendMessage(Utils.colorize(total
-                        .replace("%display_amount%", String.valueOf(DisplayPlugin.getInstance().displays.size()))));
+                        .replace("%display_amount%", String.valueOf(DeluxeAuctionsDisplay.getInstance().displays.size()))));
                 return true;
             }
         }
 
-        me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "command_usage");
+        me.sedattr.deluxeauctionsdisplay.others.Utils.sendMessage(player, "command_usage");
         return false;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
-        if (!commandSender.hasPermission(DisplayPlugin.getInstance().config.getString("permission", "auctiondisplay.command")) && !commandSender.isOp())
+        if (!commandSender.hasPermission(DeluxeAuctionsDisplay.getInstance().config.getString("permission", "auctiondisplay.command")) && !commandSender.isOp())
             return null;
 
         if (args.length > 0)
             if (args[0].equalsIgnoreCase("teleport") || args[0].equalsIgnoreCase("delete"))
-                return DisplayPlugin.getInstance().displays.keySet().stream().toList();
+                return DeluxeAuctionsDisplay.getInstance().displays.keySet().stream().toList();
 
         ArrayList<String> complete = new ArrayList<>(Arrays.asList("create", "give", "teleport", "list", "delete"));
 

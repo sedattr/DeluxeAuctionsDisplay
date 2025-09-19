@@ -14,6 +14,6 @@ public class DisplayItem {
         this.name = name;
         this.position = position;
 
-        DisplayPlugin.getInstance().placeItems.add(this);
+        DeluxeAuctionsDisplay.getInstance().placeItems.add(this);
     }
 }

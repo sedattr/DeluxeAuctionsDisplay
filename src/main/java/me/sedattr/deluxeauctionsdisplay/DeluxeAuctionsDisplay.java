@@ -11,15 +11,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
-public class DisplayPlugin extends JavaPlugin {
-    @Getter private static DisplayPlugin instance;
+public class DeluxeAuctionsDisplay extends JavaPlugin {
+    @Getter private static DeluxeAuctionsDisplay instance;
 
     public DisplayDatabase database;
     public FileConfiguration config;
 
     public HashMap<String, ItemStack> items = new HashMap<>();
     public HashMap<String, DisplayManager> displays = new HashMap<>();
-    public Set<DisplayItem> placeItems = new HashSet<DisplayItem>();
+    public Set<DisplayItem> placeItems = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -34,7 +34,7 @@ public class DisplayPlugin extends JavaPlugin {
         this.config = getConfig();
         this.database = new DisplayDatabase();
 
-        Bukkit.getPluginManager().registerEvents(new DisplayListeners(), DisplayPlugin.getInstance());
+        Bukkit.getPluginManager().registerEvents(new DisplayListeners(), DeluxeAuctionsDisplay.getInstance());
 
         PluginCommand command = getCommand("auctiondisplay");
         if (command != null)

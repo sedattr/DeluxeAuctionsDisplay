@@ -3,6 +3,8 @@ package me.sedattr.deluxeauctionsdisplay;
 import me.sedattr.auctionsapi.cache.AuctionCache;
 import me.sedattr.deluxeauctions.managers.Auction;
 import me.sedattr.deluxeauctions.managers.AuctionType;
+import me.sedattr.deluxeauctionsdisplay.others.TaskUtils;
+import me.sedattr.deluxeauctionsdisplay.others.Utils;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -16,7 +18,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class DisplayDatabase {
-    private final File database = new File(DisplayPlugin.getInstance().getDataFolder(), "database.yml");
+    private final File database = new File(DeluxeAuctionsDisplay.getInstance().getDataFolder(), "database.yml");
     private BukkitTask task;
 
     public void load() {
@@ -46,7 +48,7 @@ public class DisplayDatabase {
                     continue;
 
                 if (location.getWorld() == null) {
-                    DisplayPlugin.getInstance().database.delete(name);
+                    DeluxeAuctionsDisplay.getInstance().database.delete(name);
                     return;
                 }
 
@@ -54,7 +56,7 @@ public class DisplayDatabase {
                 displayManagers.put(name, displayManager);
             }
 
-            DisplayPlugin.getInstance().displays = displayManagers;
+            DeluxeAuctionsDisplay.getInstance().displays = displayManagers;
         } catch (IOException | InvalidConfigurationException e) {
             throw new RuntimeException(e);
         }
@@ -105,27 +107,24 @@ public class DisplayDatabase {
         if (this.task != null)
             this.task.cancel();
 
-        this.task = new BukkitRunnable() {
-            @Override
-            public void run() {
-                List<Auction> auctions = AuctionCache.getFilteredAuctions(AuctionType.valueOf(DisplayPlugin.getInstance().config.getString("auction_type", "ALL")), null, null, null);
-                auctions.sort(Comparator.comparing(Auction::getAuctionPrice));
-                Collections.reverse(auctions);
+        TaskUtils.runTimerAsync(() -> {
+            List<Auction> auctions = AuctionCache.getFilteredAuctions(AuctionType.valueOf(DeluxeAuctionsDisplay.getInstance().config.getString("auction_type", "ALL")), null, null, null);
+            auctions.sort(Comparator.comparing(Auction::getAuctionPrice));
+            Collections.reverse(auctions);
 
-                for (DisplayManager displayManager : DisplayPlugin.getInstance().displays.values()) {
-                    if (auctions.size() < displayManager.getPosition()) {
-                        displayManager.changeAuction(null);
-                        continue;
-                    }
-
-                    displayManager.changeAuction(auctions.get(displayManager.getPosition() - 1));
+            for (DisplayManager displayManager : DeluxeAuctionsDisplay.getInstance().displays.values()) {
+                if (auctions.size() < displayManager.getPosition()) {
+                    displayManager.changeAuction(null);
+                    continue;
                 }
+
+                displayManager.changeAuction(auctions.get(displayManager.getPosition() - 1));
             }
-        }.runTaskTimerAsynchronously(DisplayPlugin.getInstance(), 100, DisplayPlugin.getInstance().config.getInt("refresh_time", 60) * 20L);
+        }, 100, DeluxeAuctionsDisplay.getInstance().config.getInt("refresh_time", 60) * 20L);
     }
 
     public void loadItems() {
-        ConfigurationSection section = DisplayPlugin.getInstance().config.getConfigurationSection("display_items");
+        ConfigurationSection section = DeluxeAuctionsDisplay.getInstance().config.getConfigurationSection("display_items");
         if (section == null)
             return;
 
@@ -138,10 +137,10 @@ public class DisplayDatabase {
             newItems.put(item, itemStack);
         }
 
-        ItemStack itemStack = me.sedattr.deluxeauctions.others.Utils.createItemFromSection(DisplayPlugin.getInstance().config.getConfigurationSection("default_item"), null);
+        ItemStack itemStack = me.sedattr.deluxeauctions.others.Utils.createItemFromSection(DeluxeAuctionsDisplay.getInstance().config.getConfigurationSection("default_item"), null);
         if (itemStack != null)
             newItems.put("default", itemStack);
 
-        DisplayPlugin.getInstance().items = newItems;
+        DeluxeAuctionsDisplay.getInstance().items = newItems;
     }
 }

@@ -1,10 +1,12 @@
 package me.sedattr.deluxeauctionsdisplay;
 
-import me.sedattr.auctionsapi.cache.AuctionCache;
 import me.sedattr.deluxeauctions.managers.Auction;
 import me.sedattr.deluxeauctions.managers.AuctionType;
 import me.sedattr.deluxeauctions.menus.BinViewMenu;
 import me.sedattr.deluxeauctions.menus.NormalViewMenu;
+import me.sedattr.deluxeauctionsdisplay.others.TaskUtils;
+import me.sedattr.deluxeauctionsdisplay.others.Utils;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.ArmorStand;
@@ -18,13 +20,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class DisplayListeners implements Listener {
     @EventHandler
     public void onClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        for (DisplayManager displayManager : DisplayPlugin.getInstance().displays.values()) {
+        for (DisplayManager displayManager : DeluxeAuctionsDisplay.getInstance().displays.values()) {
             Sign sign = displayManager.getSign();
             if (sign == null)
                 continue;
@@ -44,18 +47,18 @@ public class DisplayListeners implements Listener {
             return;
 
         Player player = event.getPlayer();
-        for (DisplayManager displayManager : DisplayPlugin.getInstance().displays.values()) {
+        for (DisplayManager displayManager : DeluxeAuctionsDisplay.getInstance().displays.values()) {
             if (!displayManager.getHeadStand().equals(armorStand) && !displayManager.getTitleStand().equals(armorStand))
                 continue;
 
             event.setCancelled(true);
             if (player.isSneaking())
-                if (player.hasPermission(DisplayPlugin.getInstance().config.getString("permission", "auctiondisplay.command")) || player.isOp()) {
+                if (player.hasPermission(DeluxeAuctionsDisplay.getInstance().config.getString("permission", "auctiondisplay.command")) || player.isOp()) {
                     displayManager.delete();
-                    DisplayPlugin.getInstance().displays.remove(displayManager.getName());
-                    DisplayPlugin.getInstance().database.delete(displayManager.getName());
+                    DeluxeAuctionsDisplay.getInstance().displays.remove(displayManager.getName());
+                    DeluxeAuctionsDisplay.getInstance().database.delete(displayManager.getName());
 
-                    me.sedattr.deluxeauctionsdisplay.Utils.sendMessage(player, "deleted");
+                    Utils.sendMessage(player, "deleted");
                     return;
                 }
 
@@ -66,18 +69,18 @@ public class DisplayListeners implements Listener {
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
-        if (!player.hasPermission(DisplayPlugin.getInstance().config.getString("permission", "auctiondisplay.command")) && !player.isOp())
+        if (!player.hasPermission(DeluxeAuctionsDisplay.getInstance().config.getString("permission", "auctiondisplay.command")) && !player.isOp())
             return;
 
         ItemStack item = player.getItemInHand();
 
-        for (DisplayItem displayItem : DisplayPlugin.getInstance().placeItems) {
+        for (DisplayItem displayItem : DeluxeAuctionsDisplay.getInstance().placeItems) {
             if (displayItem.getItem().equals(item)) {
                 event.setCancelled(true);
 
                 player.getInventory().removeItem(item);
 
-                if (DisplayPlugin.getInstance().displays.containsKey(displayItem.getName())) {
+                if (DeluxeAuctionsDisplay.getInstance().displays.containsKey(displayItem.getName())) {
                     Utils.sendMessage(player, "already_created");
                     return;
                 }
@@ -89,10 +92,10 @@ public class DisplayListeners implements Listener {
 
                 DisplayManager displayManager = new DisplayManager(location, displayItem.getPosition(), displayItem.getName());
 
-                DisplayPlugin.getInstance().database.save(displayManager);
-                DisplayPlugin.getInstance().displays.put(displayItem.getName(), displayManager);
+                DeluxeAuctionsDisplay.getInstance().database.save(displayManager);
+                DeluxeAuctionsDisplay.getInstance().displays.put(displayItem.getName(), displayManager);
 
-                DisplayPlugin.getInstance().placeItems.remove(displayItem);
+                DeluxeAuctionsDisplay.getInstance().placeItems.remove(displayItem);
                 return;
             }
         }
@@ -111,25 +114,37 @@ public class DisplayListeners implements Listener {
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
-        for (DisplayManager displayManager : DisplayPlugin.getInstance().displays.values()) {
-            if (!displayManager.getLocation().getChunk().equals(event.getChunk()))
+        Chunk chunk = event.getChunk();
+
+        for (DisplayManager displayManager : DeluxeAuctionsDisplay.getInstance().displays.values()) {
+            if (displayManager == null)
+                continue;
+
+            Location loc = displayManager.getLocation();
+            if (loc == null)
+                continue;
+            if (loc.getWorld() == null)
+                continue;
+            if (loc.getWorld() != chunk.getWorld())
+                continue;
+            if (loc.getBlockX() >> 4 != chunk.getX() || loc.getBlockZ() >> 4 != chunk.getZ())
                 continue;
 
             if (displayManager.getHeadStand() == null || !displayManager.getHeadStand().isValid() ||
-                displayManager.getTitleStand() == null || !displayManager.getTitleStand().isValid()) {
-                displayManager.respawnEntities();
+                    displayManager.getTitleStand() == null || !displayManager.getTitleStand().isValid()) {
+                TaskUtils.run(displayManager::respawnEntities);
             }
         }
     }
 
     private boolean handleAuction(DisplayManager displayManager, Player player) {
-        if (displayManager.getAuction() == null) {
+        Auction auc = displayManager.getAuction();
+        if (auc == null) {
             Utils.sendMessage(player, "empty_display");
             return false;
         }
 
-        Auction auc = AuctionCache.getAuction(displayManager.getAuction());
-        if (auc == null || auc.isEnded()) {
+        if (auc.isEnded()) {
             Utils.sendMessage(player, "ended_auction");
             return false;
         }

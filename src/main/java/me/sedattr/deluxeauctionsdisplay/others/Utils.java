@@ -1,7 +1,8 @@
-package me.sedattr.deluxeauctionsdisplay;
+package me.sedattr.deluxeauctionsdisplay.others;
 
 import de.tr7zw.changeme.nbtapi.NBT;
 import me.sedattr.deluxeauctions.DeluxeAuctions;
+import me.sedattr.deluxeauctionsdisplay.DeluxeAuctionsDisplay;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -27,9 +28,9 @@ public class Utils {
         if (player == null)
             return;
 
-        List<String> messageList = DisplayPlugin.getInstance().config.getStringList(text);
+        List<String> messageList = DeluxeAuctionsDisplay.getInstance().config.getStringList(text);
         if (messageList.isEmpty()) {
-            String message = DisplayPlugin.getInstance().config.getString(text);
+            String message = DeluxeAuctionsDisplay.getInstance().config.getString(text);
 
             if (message == null)
                 return;
