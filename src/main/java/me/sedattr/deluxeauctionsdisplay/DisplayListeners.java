@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -105,6 +106,19 @@ public class DisplayListeners implements Listener {
                 continue;
 
             entity.remove();
+        }
+    }
+
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent event) {
+        for (DisplayManager displayManager : DisplayPlugin.getInstance().displays.values()) {
+            if (!displayManager.getLocation().getChunk().equals(event.getChunk()))
+                continue;
+
+            if (displayManager.getHeadStand() == null || !displayManager.getHeadStand().isValid() ||
+                displayManager.getTitleStand() == null || !displayManager.getTitleStand().isValid()) {
+                displayManager.respawnEntities();
+            }
         }
     }
 
