@@ -1,6 +1,7 @@
 package me.sedattr.deluxeauctionsdisplay;
 
 import lombok.Getter;
+import me.sedattr.auctionsapi.cache.AuctionCache;
 import me.sedattr.deluxeauctions.DeluxeAuctions;
 import me.sedattr.deluxeauctions.managers.Auction;
 import me.sedattr.deluxeauctions.others.PlaceholderUtil;
@@ -164,9 +165,10 @@ public class DisplayManager {
 
                 if (DisplayManager.this.spawnItem) {
                     if (DisplayManager.this.item != null) {
-                        Utils.loadChunk(DisplayManager.this.item.getLocation());
-
-                        DisplayManager.this.item.remove();
+                        if (DisplayManager.this.item.isValid()) {
+                            Utils.loadChunk(DisplayManager.this.item.getLocation());
+                            DisplayManager.this.item.remove();
+                        }
                         DisplayManager.this.item = null;
                     }
 
@@ -229,5 +231,25 @@ public class DisplayManager {
             this.headStand.setCustomNameVisible(true);
         } else
             this.headStand.setCustomNameVisible(false);
+    }
+
+    public void respawnEntities() {
+        Utils.loadChunk(this.location);
+        Utils.removeOldEntities(this.location);
+
+        this.headStand = this.location.getWorld().spawn(this.location, ArmorStand.class);
+        Utils.setDisplayTag(this.headStand);
+        Utils.updateArmorStand(this.headStand);
+
+        this.titleStand = this.location.getWorld().spawn(this.location.clone().add(0, 0.25, 0), ArmorStand.class);
+        Utils.setDisplayTag(this.titleStand);
+        Utils.updateArmorStand(this.titleStand);
+
+        ItemStack itemStack = getItemStack();
+        if (itemStack != null)
+            this.headStand.setHelmet(itemStack);
+
+        updateTitles(this.auction != null ? AuctionCache.getAuction(this.auction) : null);
+        updateSign(this.auction != null ? AuctionCache.getAuction(this.auction) : null);
     }
 }
